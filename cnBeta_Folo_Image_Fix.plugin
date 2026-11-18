@@ -3,19 +3,16 @@
 #!author = Wansensr (Optimized)
 #!date = 2026-11-18
 #!loon_version = 3.2.1
-#!icon = https://app.follow.is/apple-touch-icon.png
+#!icon = https://raw.githubusercontent.com/RSSNext/Folo/main/apps/desktop/resources/icon.png
 
 [Rule]
-# 强制 cnBeta 全系图床直连，防止代理节点 IP 被 CDN 拉黑
 DOMAIN-SUFFIX, cnbetacdn.com, DIRECT
 DOMAIN-SUFFIX, cnbeta.com.tw, DIRECT
 DOMAIN-SUFFIX, cnbeta.com, DIRECT
 
 [Script]
-# 1. 拦截 Folo 代理请求，用 JS 彻底解码并重定向至原图
 http-request ^https?:\/\/(img|img-proxy)\.folo\.is\/.*url= script-path=data:text/javascript;charset=utf-8,const%20u%3Dnew%20URL(%24request.url)%3Blet%20t%3Du.searchParams.get(%22url%22)%3Bif(t)%7Bwhile(t.includes(%22%253A%22)%7C%7Ct.includes(%22%252F%22))%7Btry%7Bt%3DdecodeURIComponent(t)%7Dcatch(e)%7Bbreak%7D%7Dif(%2F(cnbetacdn%7Ccnbeta)%5C.(com%7Ccom%5C.tw)%2Fi.test(t))%7B%24done(%7Bresponse%3A%7Bstatus%3A302%2Cheaders%3A%7BLocation%3At%7D%7D%7D)%7Delse%7B%24done(%7B%7D)%7D%7Delse%7B%24done(%7B%7D)%7D, tag=Folo代理转直链
 
-# 2. 补充 cnBeta 全系图床 Referer 绕过防盗链
 http-request ^https?:\/\/[^\/]+\.(cnbetacdn|cnbeta)\.(com|com\.tw)\/ script-path=data:text/javascript;charset=utf-8,let%20h%3D%24request.headers%3Bh%5B%22Referer%22%5D%3D%22https%3A%2F%2Fwww.cnbeta.com.tw%2F%22%3Bdelete%20h%5B%22referer%22%5D%3B%24done(%7Bheaders%3Ah%7D)%3B, tag=cnBeta防盗链修复
 
 [MitM]
