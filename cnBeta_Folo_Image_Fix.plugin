@@ -1,4 +1,4 @@
-#!name = cnBeta 图片修复 Pro
+#!name = cnBeta 图片修复
 #!desc = 自动解码 Folo 图片代理（支持多层 URL 编码与多参数剥离），覆盖 cnBeta 全系图床防盗链并强制直连
 #!author = Wansensr (Optimized)
 #!date = 2026-11-18
