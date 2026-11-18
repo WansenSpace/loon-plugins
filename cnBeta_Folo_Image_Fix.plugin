@@ -1,14 +1,21 @@
-#!name = cnBeta 图片修复
-#!desc = 修复 cnBeta 图片防盗链，并将 Folo 失败的 cnBeta 图片代理转换为原图直链
-#!icon = https://raw.githubusercontent.com/RSSNext/Folo/dev/apps/mobile/assets/icon.png
-#!loon_version = 3.5.1(978)
-#!date = 2026-11-09
+#!name = cnBeta 图片修复 Pro
+#!desc = 自动解码 Folo 图片代理（支持多层 URL 编码与多参数剥离），覆盖 cnBeta 全系图床防盗链并强制直连
+#!author = Wansensr (Optimized)
+#!date = 2026-11-18
+#!loon_version = 3.2.1
 
-[Rewrite]
-# 仅处理 Folo 中由 cnBeta 原图转换而来的图片代理请求
-request if ${url} ~= /^https:\/\/img\.folo\.is\/\?url=https%3A%2F%2Fstatic\.cnbetacdn\.com%2Farticle%2F(\d{4})%2F(\d{4})%2F([A-Za-z0-9._-]+\.(?:jpe?g|png|webp|gif))(?:&.*)?$/i as cbimg then url.replace("https://static.cnbetacdn.com/article/${cbimg.1}/${cbimg.2}/${cbimg.3}") | request.header.set("Referer", "https://www.cnbeta.com.tw/") | request.header.del("Origin")
-# 修复直接访问 cnBeta 图床时缺失或错误的 Referer
-request if ${url} ~= /^https:\/\/static\.cnbetacdn\.com\// then request.header.set("Referer", "https://www.cnbeta.com.tw/") | request.header.del("Origin")
+[Rule]
+# 强制 cnBeta 全系图床直连，防止代理节点 IP 被 CDN 拉黑
+DOMAIN-SUFFIX, cnbetacdn.com, DIRECT
+DOMAIN-SUFFIX, cnbeta.com.tw, DIRECT
+DOMAIN-SUFFIX, cnbeta.com, DIRECT
 
-[Mitm]
-hostname = static.cnbetacdn.com, img.folo.is
+[Script]
+# 1. 拦截 Folo 代理请求，用 JS 彻底解码并重定向至原图
+http-request ^https?:\/\/(img|img-proxy)\.folo\.is\/.*url= script-path=data:text/javascript;charset=utf-8,const%20u%3Dnew%20URL(%24request.url)%3Blet%20t%3Du.searchParams.get(%22url%22)%3Bif(t)%7Bwhile(t.includes(%22%253A%22)%7C%7Ct.includes(%22%252F%22))%7Btry%7Bt%3DdecodeURIComponent(t)%7Dcatch(e)%7Bbreak%7D%7Dif(%2F(cnbetacdn%7Ccnbeta)%5C.(com%7Ccom%5C.tw)%2Fi.test(t))%7B%24done(%7Bresponse%3A%7Bstatus%3A302%2Cheaders%3A%7BLocation%3At%7D%7D%7D)%7Delse%7B%24done(%7B%7D)%7D%7Delse%7B%24done(%7B%7D)%7D, tag=Folo代理转直链
+
+# 2. 补充 cnBeta 全系图床 Referer 绕过防盗链
+http-request ^https?:\/\/[^\/]+\.(cnbetacdn|cnbeta)\.(com|com\.tw)\/ script-path=data:text/javascript;charset=utf-8,let%20h%3D%24request.headers%3Bh%5B%22Referer%22%5D%3D%22https%3A%2F%2Fwww.cnbeta.com.tw%2F%22%3Bdelete%20h%5B%22referer%22%5D%3B%24done(%7Bheaders%3Ah%7D)%3B, tag=cnBeta防盗链修复
+
+[MitM]
+hostname = *.cnbetacdn.com, *.cnbeta.com.tw, *.cnbeta.com, img.folo.is, img-proxy.folo.is
