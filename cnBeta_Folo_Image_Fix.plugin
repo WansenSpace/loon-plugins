@@ -3,7 +3,7 @@
 #!author = Wansensr (Optimized)
 #!date = 2026-11-18
 #!loon_version = 3.2.1
-#!icon = https://raw.githubusercontent.com/Orz-3/mini/master/Color/Folo.png
+#!icon = https://app.follow.is/apple-touch-icon.png
 
 [Rule]
 # 强制 cnBeta 全系图床直连，防止代理节点 IP 被 CDN 拉黑
