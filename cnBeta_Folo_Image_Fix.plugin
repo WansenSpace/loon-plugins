@@ -3,7 +3,7 @@
 #!author = Wansensr (Optimized)
 #!date = 2026-11-18
 #!loon_version = 3.2.1
-#!icon = data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjI4IiBmaWxsPSIjRkY1QzAwIi8+PHBhdGggZD0iTTQyIDM4aDM2YTYgNiAwIDAgMSAwIDEySDQyYTYgNiAwIDAgMSAwLTEyem0wIDIyaDI0YTYgNiAwIDAgMSAwIDEySDQyYTYgNiAwIDAgMSAwLTEyem0wIDIyaDEyYTYgNiAwIDAgMSAwIDEySDQyYTYgNiAwIDAgMSAwLTEyeiIgZmlsbD0iI0ZGRiIvPjwvc3ZnPg==
+#!icon = https://cdn.jsdelivr.net/gh/luestr/IconResource@main/App_icon/120px/Follow.png
 
 [Rule]
 # 强制 cnBeta 全系图床直连，防止代理节点 IP 被 CDN 拉黑
