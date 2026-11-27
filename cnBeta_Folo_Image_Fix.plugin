@@ -1,17 +1,30 @@
-#!name = cnBeta 图片修复
-#!desc = 自动解码 Folo 图片代理（支持多层 URL 编码与多参数剥离），覆盖 cnBeta 全系图床防盗链并强制直连
+#!name = cnBeta 图片修复V1
+#!desc = 解决 Folo 订阅 cnBeta 新闻图片不显示或加载慢的问题：仅对 cnBeta 代理图解码并 301 长效缓存转直链，原生 Rewrite 修复防盗链，屏蔽 QUIC 防止绕过 MitM，图床强制直连
 #!author = WansenSpace
+#!icon = https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e2/71/4a/e2714ad7-e11d-0525-e599-e310befca80d/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg
+#!system = iOS
+#!system_version = 15.0
 #!loon_version = 3.2.1
 #!date = 2026-11-27
 
 [Rule]
+# === 屏蔽 QUIC，防止 Folo 图片代理走 HTTP/3 绕过 MitM 导致超时回退 ===
+PROTOCOL, QUIC, REJECT
+
+# === cnBeta 全系图床强制直连，避免绕道海外代理节点 ===
 DOMAIN-SUFFIX, cnbetacdn.com, DIRECT
 DOMAIN-SUFFIX, cnbeta.com.tw, DIRECT
 DOMAIN-SUFFIX, cnbeta.com, DIRECT
 
+[Rewrite]
+# === 原生 Rewrite 修复 cnBeta 全系图床防盗链（零 JS 开销） ===
+^https?:\/\/[^\/]+\.(cnbetacdn|cnbeta)\.(com|com\.tw)\/ header-del Origin
+^https?:\/\/[^\/]+\.(cnbetacdn|cnbeta)\.(com|com\.tw)\/ header-del Referer
+^https?:\/\/[^\/]+\.(cnbetacdn|cnbeta)\.(com|com\.tw)\/ header-add Referer https://www.cnbeta.com.tw/
+
 [Script]
-http-request ^https?:\/\/(img|img-proxy)\.folo\.is\/.*url= script-path=https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/scripts/folo_cnbeta_redirect.js, tag=Folo代理转直链
-http-request ^https?:\/\/[^\/]+\.(cnbetacdn|cnbeta)\.(com|com\.tw)\/ script-path=https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/scripts/cnbeta_referer_fix.js, tag=cnBeta防盗链修复
+# === 仅匹配包含 cnbeta 的 Folo 代理请求，避免误触发其他 RSS 图床 ===
+http-request ^https?:\/\/(img|img-proxy|webp)\.folo\.is\/.*url=.*[cC][nN][bB][eE][tT][aA] script-path=https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/scripts/folo_cnbeta_redirect.js, tag=Folo代理转直链
 
 [MitM]
-hostname = *.cnbetacdn.com, *.cnbeta.com.tw, *.cnbeta.com, img.folo.is, img-proxy.folo.is
+hostname = *.cnbetacdn.com, *.cnbeta.com.tw, *.cnbeta.com, img.folo.is, img-proxy.folo.is, webp.folo.is

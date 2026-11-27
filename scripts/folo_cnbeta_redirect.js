@@ -1,6 +1,7 @@
 /**
- * Folo 图片代理转直链（仅针对 cnBeta 全系图床）
- * 自动解码多层 URL 编码，剥离额外代理参数，返回 302 重定向到 cnBeta 原图地址
+ * Folo 图片代理转直链（V1 优化版，仅针对 cnBeta 全系图床）
+ * - 自动解码多层 URL 编码，剥离额外代理参数
+ * - 返回 301 + 长效 Cache-Control，避免重复跳转耗时
  */
 
 const url = $request.url || "";
@@ -38,10 +39,10 @@ const isCnBetaImage =
 if (isCnBetaImage) {
   $done({
     response: {
-      status: 302,
+      status: 301,
       headers: {
         Location: targetUrl,
-        "Cache-Control": "no-cache"
+        "Cache-Control": "public, max-age=604800, immutable"
       }
     }
   });

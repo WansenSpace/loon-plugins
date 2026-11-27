@@ -12,10 +12,10 @@
   https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/TencentComic_AdBlock.plugin
   ```
 
-### cnBeta 图片修复（Folo）
+### cnBeta 图片修复V1（Folo）
 
-- **作用**：解决在 Folo 中 RSS 订阅 cnBeta 新闻时，文章图片经常无法显示（裂图）的问题。
-- **原理**：自动解码 Folo 图片代理链接并重定向为原图直连，同时为 cnBeta 全系图床补全防盗链请求头并强制直连。
+- **作用**：解决在 Folo 中 RSS 订阅 cnBeta 新闻时，文章图片经常无法显示（裂图）或加载较慢的问题。
+- **原理**：仅对 cnBeta 的 Folo 图片代理请求解码并 301 长效缓存转直连，使用 Loon 原生 `[Rewrite]` 修复 cnBeta 全系图床防盗链（零 JS 开销），屏蔽 QUIC 防止绕过 MitM，并将图床域名强制直连。
 - **插件订阅链接（Raw）**：
   ```
   https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/cnBeta_Folo_Image_Fix.plugin
