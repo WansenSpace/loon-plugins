@@ -1,5 +1,5 @@
 #!name = 腾讯动漫去广告（极限净化版）
-#!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、我的页面福利中心/游戏中心/八宫格、书架推荐/红点、AI/限免卡/成长任务、搜索热词、V会员页内容及主流聚合广告 SDK
+#!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、我的页面福利中心/游戏中心/八宫格、书架推荐/红点、AI/限免卡/成长任务、搜索热词、V会员页完整内容及主流聚合广告 SDK
 #!author = WansenSpace
 #!icon = https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/63/5f/7f/635f7fbf-22c8-feb9-c8db-acda372d6ca3/AppIcon-0-1x_U007emarketing-0-8-0-0-sRGB-85-220-0.png/512x512bb.jpg
 #!system = iOS
@@ -95,21 +95,29 @@ DOMAIN, adashxgc.ut.taobao.com, REJECT
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/LimitFreeCard\/getCardInfo reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Task\/getGrowInfo reject-dict
 
-# === 极限净化：书架推荐/红点、搜索热词、V会员页 ===
+# === 极限净化：书架推荐/红点、搜索热词 ===
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Recommend\/getBookShelfRecommend reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Bookshelf\/getCollectionRedDot\/.* reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Search\/hotWord reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/navigationBarTip reject-dict
+
+# === 极限净化：V会员页（主接口 + H5 页 + 专属反馈通道） ===
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/home($|\?|\/) reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/homeAsync reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/navigationBarTip reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/iosPayConfigs\/.* reject-dict
+^https?:\/\/m\.ac\.qq\.com\/event\/appHtmlPage\/weex\/v-club-home\.html.* reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/getAiseeUrl.*v_club_feedback.* reject-dict
 
 # === 通用广告与推广接口 ===
 ^https?:\/\/.*\.ac\.qq\.com\/.*(splash|getSplash|bootScreen|adRealTime|promotion\/|getAd|advert) reject-dict
 ^https?:\/\/img0\.qidian\.com\/upload\/gamesy\/.* reject-img
 ^https?:\/\/webcast-open\.douyin\.com\/webcast\/openapi\/pangle\/.* reject-dict
+^https?:\/\/lf-cdn-tos\.bytescm\.com\/obj\/static\/ad\/.* reject-dict
+^https?:\/\/tnc\d+-[a-z0-9]+\.zijieapi\.com\/get_domains\/.* reject-dict
+^https?:\/\/vod-license-m\.volccdn\.com\/vod-license\/.*webcast.* reject
 ^https?:\/\/.*\.gdt\.qq\.com\/.* reject-dict
 ^https?:\/\/.*\.pangolin-sdk-toutiao[0-9a-z-]*\.com\/.* reject-dict
 ^https?:\/\/.*\.pglstatp-toutiao\.com\/.* reject-dict
 
 [MitM]
-hostname = ac.qq.com, iphone.ac.qq.com, *.ac.qq.com, *.gdt.qq.com, *.pangolin-sdk-toutiao.com, *.pangolin-sdk-toutiao1.com, *.pangolin-sdk-toutiao-b.com, *.pglstatp-toutiao.com, webcast-open.douyin.com, img0.qidian.com
+hostname = ac.qq.com, iphone.ac.qq.com, m.ac.qq.com, *.ac.qq.com, *.gdt.qq.com, *.pangolin-sdk-toutiao.com, *.pangolin-sdk-toutiao1.com, *.pangolin-sdk-toutiao-b.com, *.pglstatp-toutiao.com, webcast-open.douyin.com, img0.qidian.com, lf-cdn-tos.bytescm.com, tnc3-alisc1.zijieapi.com, vod-license-m.volccdn.com
