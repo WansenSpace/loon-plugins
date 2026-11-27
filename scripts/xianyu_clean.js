@@ -1,9 +1,11 @@
 /*
- * 闲鱼 (Goofish) 深度去广告与页面精简脚本 V2 (Loon http-response)
+ * 闲鱼 (Goofish) 深度去广告与页面精简脚本 V3 (Loon http-request + http-response)
  * 仓库：https://github.com/WansenSpace/loon-plugins
  * 作用：
  *   1. 清空开屏广告池与预取缓存（同步/异步/同城），保留 MTOP 成功信封防止读取本地旧缓存
- *   2. 针对 fy26 首页右上角「签到」原生兜底图标：将 BIZ_IDLE_COIN_ENTRANCE_2 动态贴图替换为 1x1 透明图并清空文案/跳转，同时清理顶栏「补贴中」动图与「回收」频道
+ *   2. 极速遮蔽首页右上角「签到」原生图标：
+ *      - 使用阿里 CDN 原生 1 年强缓存 (max-age=31536000) 的 2x2 纯透明 PNG 覆盖 BIZ_IDLE_COIN_ENTRANCE_2 贴图，让客户端本地磁盘缓存该透明图；
+ *      - 首次响应净化后写入 $persistentStore，后续每次启动在 http-request 阶段毫秒级直接回放，消除 0.5~1s 网络往返闪烁延迟
  *   3. 禁用 rule.config 下发的首页摇一摇触发器 (luxury_home_shake)
  *   4. 过滤首页、同城、关注、圈子、新发及搜索结果中的信息流广告与运营卡片
  *   5. 清除搜索框填充词、搜索发现热词及悬浮广告（保留底部「卖闲置」发布球）
@@ -14,7 +16,41 @@
 
 (function () {
   const url = (typeof $request !== "undefined" && $request && $request.url) ? String($request.url) : "";
-  const rawBody = (typeof $response !== "undefined" && $response) ? $response.body : null;
+  // 阿里 CDN 官方 67 字节 2x2 纯透明 PNG（Alpha=0，自带 Cache-Control: max-age=31536000 供闲鱼本地磁盘强缓存）
+  const BLANK_IMG = "https://gw.alicdn.com/imgextra/i4/O1CN01CYtPWu1MUBqQAUK9D_!!6000000001437-2-tps-2-2.png";
+  const STRATEGY_CACHE_KEY = "xianyu_strategy_clean_v3";
+  const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 天自动刷新一次
+
+  function hasApi(name) {
+    return url.includes(`/${name}/`) || url.includes(`/${name}?`) || url.endsWith(`/${name}`);
+  }
+
+  // ==================== 阶段 A：http-request 毫秒级本地瞬时回放 ====================
+  if (typeof $response === "undefined") {
+    if (hasApi("mtop.taobao.idle.user.strategy.list") && typeof $persistentStore !== "undefined") {
+      try {
+        const rawCache = $persistentStore.read(STRATEGY_CACHE_KEY);
+        if (rawCache) {
+          const parsed = JSON.parse(rawCache);
+          if (parsed && parsed.body && typeof parsed.ts === "number" && Date.now() - parsed.ts < CACHE_TTL_MS) {
+            return $done({
+              response: {
+                status: 200,
+                headers: {
+                  "Content-Type": "application/json;charset=UTF-8"
+                },
+                body: parsed.body
+              }
+            });
+          }
+        }
+      } catch (e) {}
+    }
+    return $done({});
+  }
+
+  // ==================== 阶段 B：http-response 响应体精细净化 ====================
+  const rawBody = $response ? $response.body : null;
   if (!rawBody || typeof rawBody !== "string") {
     return $done({});
   }
@@ -43,19 +79,16 @@
 
   const d = obj.data;
   let customHeaders = null;
-  const BLANK_IMG = "https://acs.m.goofish.com/__blank_1x1__.png";
 
-  function hasApi(name) {
-    return url.includes(`/${name}/`) || url.includes(`/${name}?`) || url.endsWith(`/${name}`);
-  }
-
-  // 递归将闲鱼币入口策略内的所有图片替换为 1x1 透明图，清空文案与跳转
   function blankOutRenderNode(node, depth = 0) {
     if (!node || typeof node !== "object" || depth > 8) return;
     for (const k of Object.keys(node)) {
       const val = node[k];
       if (typeof val === "string") {
-        if (/^(img|iosImg|androidImg|icon|pic|bg|lottie|apng|gif|video|image|avatar| atmosphere)/i.test(k) || /^https?:\/\/.*\.(png|apng|jpg|jpeg|webp|gif|svga|json)(\?|$)/i.test(val)) {
+        if (
+          /^(img|iosImg|androidImg|icon|pic|bg|lottie|apng|gif|video|image|avatar|atmosphere)/i.test(k) ||
+          /^https?:\/\/.*\.(png|apng|jpg|jpeg|webp|gif|svga|json)(\?|$)/i.test(val)
+        ) {
           node[k] = BLANK_IMG;
         } else if (/^(targetUrl|jumpUrl|url|link|scheme)$/i.test(k)) {
           node[k] = "";
@@ -68,11 +101,16 @@
     }
   }
 
-  function finish() {
+  function serializeObj() {
     if (dataWasString) {
       obj.data = JSON.stringify(obj.data);
     }
-    const result = { body: JSON.stringify(obj) };
+    return JSON.stringify(obj);
+  }
+
+  function finish(bodyOverride) {
+    const outBody = bodyOverride !== undefined ? bodyOverride : serializeObj();
+    const result = { body: outBody };
     if (customHeaders) {
       result.headers = customHeaders;
     }
@@ -232,9 +270,10 @@
     }
 
     // 8. 首页悬浮广告、弹窗与闲鱼币签到入口策略 (user.strategy.list)
-    // V2 改进：保留 BIZ_PUBLISH_BALL（底部卖闲置球）；若存在 BIZ_IDLE_COIN_ENTRANCE* 策略，
-    //          不直接删除（直接删除会回退展示本地静态签到图标），而是将其贴图替换为 1x1 透明像素并清空跳转
+    // V3 极速改进：当捕获到含 IDLE_COIN_ENTRANCE 的完整策略后，替换透明 PNG 并持久化缓存，
+    //               后续启动由阶段 A 在 http-request 阶段 0ms 直接返回，消除闪烁等待
     if (hasApi("mtop.taobao.idle.user.strategy.list")) {
+      let hasCoinEntrance = false;
       if (Array.isArray(d.strategies)) {
         d.strategies = d.strategies
           .filter((s) => {
@@ -244,16 +283,26 @@
           })
           .map((s) => {
             const t = String(s.type || "");
-            if (t.includes("IDLE_COIN_ENTRANCE") && s.data && typeof s.data === "object") {
-              if (s.data.renderMap) blankOutRenderNode(s.data.renderMap);
-              if (s.data.materialAttributes) blankOutRenderNode(s.data.materialAttributes);
+            if (t.includes("IDLE_COIN_ENTRANCE")) {
+              hasCoinEntrance = true;
+              if (s.data && typeof s.data === "object") {
+                if (s.data.renderMap) blankOutRenderNode(s.data.renderMap);
+                if (s.data.materialAttributes) blankOutRenderNode(s.data.materialAttributes);
+              }
             }
             return s;
           });
       }
       if (Array.isArray(d.popupStrategies)) d.popupStrategies = [];
       if (Array.isArray(d.floatStrategies)) d.floatStrategies = [];
-      return finish();
+
+      const outBody = serializeObj();
+      if (hasCoinEntrance && typeof $persistentStore !== "undefined") {
+        try {
+          $persistentStore.write(JSON.stringify({ ts: Date.now(), body: outBody }), STRATEGY_CACHE_KEY);
+        } catch (e) {}
+      }
+      return finish(outBody);
     }
 
     // 9. 「我的」页面深度精简 (mtop.idle.user.page.my.adapter)
