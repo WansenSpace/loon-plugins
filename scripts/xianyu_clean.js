@@ -1,14 +1,15 @@
 /*
- * 闲鱼 (Goofish) 深度去广告与页面精简脚本 (Loon http-response)
+ * 闲鱼 (Goofish) 深度去广告与页面精简脚本 V2 (Loon http-response)
  * 仓库：https://github.com/WansenSpace/loon-plugins
  * 作用：
  *   1. 清空开屏广告池与预取缓存（同步/异步/同城），保留 MTOP 成功信封防止读取本地旧缓存
- *   2. 移除首页右上角「签到」图标入口、顶栏「补贴中」动图标签及「回收」频道
- *   3. 过滤首页、同城、关注、圈子、新发及搜索结果中的信息流广告与运营卡片
- *   4. 清除搜索框填充词、搜索发现热词及悬浮广告（保留底部「卖闲置」发布球）
- *   5. 深度精简「我的」页面：仅保留顶部个人信息/会员/收藏栏与「我的交易」，
+ *   2. 针对 fy26 首页右上角「签到」原生兜底图标：将 BIZ_IDLE_COIN_ENTRANCE_2 动态贴图替换为 1x1 透明图并清空文案/跳转，同时清理顶栏「补贴中」动图与「回收」频道
+ *   3. 禁用 rule.config 下发的首页摇一摇触发器 (luxury_home_shake)
+ *   4. 过滤首页、同城、关注、圈子、新发及搜索结果中的信息流广告与运营卡片
+ *   5. 清除搜索框填充词、搜索发现热词及悬浮广告（保留底部「卖闲置」发布球）
+ *   6. 深度精简「我的」页面：仅保留顶部个人信息/会员/收藏栏与「我的交易」，
  *      彻底移除「闲鱼回收」、中部工具栏、活动磁贴区（闲鱼币/神奇鱼塘/闲鱼游戏/签到/赚钱）及底部「猜你喜欢」推荐流
- *   6. 精简商品详情底部推荐与订单详情页底部推荐流
+ *   7. 精简商品详情底部推荐与订单详情页底部推荐流
  */
 
 (function () {
@@ -28,7 +29,6 @@
     return $done({});
   }
 
-  // 兼容 MTOP 偶发的字符串化 data
   const dataWasString = typeof obj.data === "string";
   if (dataWasString) {
     try {
@@ -43,9 +43,29 @@
 
   const d = obj.data;
   let customHeaders = null;
+  const BLANK_IMG = "https://acs.m.goofish.com/__blank_1x1__.png";
 
   function hasApi(name) {
     return url.includes(`/${name}/`) || url.includes(`/${name}?`) || url.endsWith(`/${name}`);
+  }
+
+  // 递归将闲鱼币入口策略内的所有图片替换为 1x1 透明图，清空文案与跳转
+  function blankOutRenderNode(node, depth = 0) {
+    if (!node || typeof node !== "object" || depth > 8) return;
+    for (const k of Object.keys(node)) {
+      const val = node[k];
+      if (typeof val === "string") {
+        if (/^(img|iosImg|androidImg|icon|pic|bg|lottie|apng|gif|video|image|avatar| atmosphere)/i.test(k) || /^https?:\/\/.*\.(png|apng|jpg|jpeg|webp|gif|svga|json)(\?|$)/i.test(val)) {
+          node[k] = BLANK_IMG;
+        } else if (/^(targetUrl|jumpUrl|url|link|scheme)$/i.test(k)) {
+          node[k] = "";
+        } else if (/^(text|title|subTitle|desc|bubble|tip|tips|tag|btnText|buttonText)$/i.test(k)) {
+          node[k] = "";
+        }
+      } else if (val && typeof val === "object" && k !== "general" && k !== "trackParams") {
+        blankOutRenderNode(val, depth + 1);
+      }
+    }
   }
 
   function finish() {
@@ -79,7 +99,15 @@
       return finish();
     }
 
-    // 2. 首页欢迎弹窗 / 场景恢复弹层 / 右上角签到鱼币组件 / 同城角落浮标
+    // 2. 禁用客户端规则配置中的首页摇一摇跳转触发器 (luxury_home_shake)
+    if (hasApi("mtop.taobao.idle.rule.config")) {
+      if (Array.isArray(d.idleRuleInfo)) {
+        d.idleRuleInfo = d.idleRuleInfo.filter((r) => r && r.type !== "shake");
+      }
+      return finish();
+    }
+
+    // 3. 首页欢迎弹窗 / 场景恢复弹层 / 右上角签到鱼币组件 / 同城角落浮标
     if (
       hasApi("mtop.taobao.idle.home.welcome") ||
       hasApi("mtop.idle.idleadv.scene.restore") ||
@@ -90,7 +118,7 @@
       return finish();
     }
 
-    // 3. 首页右上角签到入口及小组件挂载容器 (whale.modulet)
+    // 4. 首页小组件挂载容器 (whale.modulet)
     if (hasApi("mtop.taobao.idle.home.whale.modulet")) {
       if (d.container && typeof d.container === "object") {
         d.container.sections = [];
@@ -101,7 +129,7 @@
       return finish();
     }
 
-    // 4. 首页顶栏标签与右上角挂件清理 (home.circle.list，同时兼容 fy26 顶层 headList 与旧版 next.headList)
+    // 5. 首页顶栏标签与右上角挂件清理 (home.circle.list，同时兼容 fy26 顶层 headList 与旧版 next.headList)
     if (hasApi("mtop.taobao.idlehome.home.circle.list")) {
       const allowedHeadBiz = new Set(["main", "market", "IDLE_CIRCLE"]);
       const cleanHeadList = (list) =>
@@ -140,7 +168,6 @@
       if (d.next && Array.isArray(d.next.circleList)) {
         d.next.circleList = cleanCircleList(d.next.circleList);
       }
-      // 清除顶栏右侧可能下发的签到/鱼币/活动挂件字段
       for (const key of ["rightButton", "rightIcon", "signEntry", "coinEntry", "coinInfo", "signInfo", "pendant", "floatIcon"]) {
         if (key in d) delete d[key];
         if (d.next && key in d.next) delete d.next[key];
@@ -148,7 +175,7 @@
       return finish();
     }
 
-    // 5. 首页主信息流与顶部金刚区净化 (home.nextfresh)
+    // 6. 首页主信息流与顶部金刚区净化 (home.nextfresh)
     if (hasApi("mtop.taobao.idlehome.home.nextfresh")) {
       delete d.bannerReturnDO;
       if (d.widgetReturnDO && typeof d.widgetReturnDO === "object") {
@@ -196,7 +223,7 @@
       return finish();
     }
 
-    // 6. 首页金刚区刷新接口 (widget.refresh.get)
+    // 7. 首页金刚区刷新接口 (widget.refresh.get)
     if (hasApi("mtop.taobao.idlehome.widget.refresh.get")) {
       if (Array.isArray(d.homeTopList)) {
         d.homeTopList = d.homeTopList.filter((item) => item && item.sectionType === "kingkongDo");
@@ -204,21 +231,32 @@
       return finish();
     }
 
-    // 7. 首页悬浮广告与弹窗策略：仅保留底部「卖闲置」发布球
+    // 8. 首页悬浮广告、弹窗与闲鱼币签到入口策略 (user.strategy.list)
+    // V2 改进：保留 BIZ_PUBLISH_BALL（底部卖闲置球）；若存在 BIZ_IDLE_COIN_ENTRANCE* 策略，
+    //          不直接删除（直接删除会回退展示本地静态签到图标），而是将其贴图替换为 1x1 透明像素并清空跳转
     if (hasApi("mtop.taobao.idle.user.strategy.list")) {
       if (Array.isArray(d.strategies)) {
-        d.strategies = d.strategies.filter(
-          (s) => s && (s.type === "BIZ_PUBLISH_BALL" || s.bizType === "publish")
-        );
+        d.strategies = d.strategies
+          .filter((s) => {
+            if (!s) return false;
+            const t = String(s.type || "");
+            return t === "BIZ_PUBLISH_BALL" || s.bizType === "publish" || t.includes("IDLE_COIN_ENTRANCE");
+          })
+          .map((s) => {
+            const t = String(s.type || "");
+            if (t.includes("IDLE_COIN_ENTRANCE") && s.data && typeof s.data === "object") {
+              if (s.data.renderMap) blankOutRenderNode(s.data.renderMap);
+              if (s.data.materialAttributes) blankOutRenderNode(s.data.materialAttributes);
+            }
+            return s;
+          });
       }
       if (Array.isArray(d.popupStrategies)) d.popupStrategies = [];
       if (Array.isArray(d.floatStrategies)) d.floatStrategies = [];
       return finish();
     }
 
-    // 8. 「我的」页面深度精简 (mtop.idle.user.page.my.adapter)
-    // 仅保留顶部头像/昵称/闲鱼会员/收藏栏 + 「我的交易」；
-    // 彻底移除「闲鱼回收」、中部工具栏、活动磁贴区（闲鱼币/神奇鱼塘/闲鱼游戏/签到/赚钱）及底部「猜你喜欢」
+    // 9. 「我的」页面深度精简 (mtop.idle.user.page.my.adapter)
     if (hasApi("mtop.idle.user.page.my.adapter") || hasApi("mtop.taobao.idle.user.page.my.adapter")) {
       if (d.container && Array.isArray(d.container.sections)) {
         d.container.sections = d.container.sections
@@ -255,7 +293,6 @@
           });
       }
 
-      // 彻底移除「我的」页面底部「猜你喜欢」容器与标题挂载点
       d.ability = [];
       delete d.feeds;
       delete d.recommend;
@@ -263,7 +300,7 @@
       return finish();
     }
 
-    // 9. 「我的」页面底部「猜你喜欢」推荐流清空（保留 MTOP 信封避免报错重试）
+    // 10. 「我的」页面底部「猜你喜欢」推荐流清空
     if (
       hasApi("mtop.taobao.idle.item.buy.feeds") ||
       hasApi("mtop.idle.user.page.my.feeds") ||
@@ -275,7 +312,7 @@
       return finish();
     }
 
-    // 10. 商品详情页底部推荐标签与列表、消息页推荐用户精简（延续可莉规则）
+    // 11. 商品详情页底部推荐标签与列表、消息页推荐用户精简
     if (hasApi("mtop.taobao.idle.item.recommend.tab")) {
       if (Array.isArray(d.tabList)) {
         d.tabList.forEach((t) => {
@@ -298,7 +335,7 @@
       return finish();
     }
 
-    // 11. 搜索框默认填充词 / 底纹词清空
+    // 12. 搜索框默认填充词 / 底纹词清空
     if (
       hasApi("mtop.taobao.idlemtopsearch.search.shade") ||
       hasApi("mtop.taobao.idlemtopsearch.detailpage.search.shade")
@@ -307,7 +344,7 @@
       return finish();
     }
 
-    // 12. 搜索激活页热搜词与搜索发现推广清理
+    // 13. 搜索激活页热搜词与搜索发现推广清理
     if (
       hasApi("mtop.taobao.idlemtopsearch.item.search.activate") ||
       hasApi("mtop.taobao.idlemtopsearch.search.activate.tablist") ||
@@ -319,7 +356,7 @@
       return finish();
     }
 
-    // 13. 搜索结果页信息流广告过滤（同时兼容 acs 与 g-acs 网关）
+    // 14. 搜索结果页信息流广告过滤（同时兼容 acs 与 g-acs 网关）
     if (hasApi("mtop.taobao.idlemtopsearch.search")) {
       if (Array.isArray(d.resultList)) {
         const badSearchTemplates = new Set([
@@ -350,7 +387,7 @@
       return finish();
     }
 
-    // 14. 关注流、社区、新发、魔方页与同城页面广告过滤
+    // 15. 关注流、社区、新发、魔方页与同城页面广告过滤
     if (hasApi("mtop.taobao.idle.fun.follow.feed.list")) {
       if (Array.isArray(d.sections)) {
         d.sections = d.sections.filter((s) => s && s.cardType === 2001);
@@ -419,7 +456,7 @@
       return finish();
     }
 
-    // 15. 订单详情页底部推荐流移除（仅保留订单状态、收货地址与订单信息）
+    // 16. 订单详情页底部推荐流移除（仅保留订单状态、收货地址与订单信息）
     if (hasApi("mtop.taobao.idle.trade.full.info")) {
       if (Array.isArray(d.components)) {
         const keepRenders = new Set(["orderStatusVO", "addressInfoVO", "orderInfoVO"]);
