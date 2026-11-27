@@ -1,0 +1,95 @@
+#!name = TikTok 去挂件
+#!desc = 屏蔽 TikTok 左上角积分/金币激励悬浮挂件（日区 P 币/福袋/TouchPoint/LuckyCat），精准阻断 UG 增长激励、活动配置与内嵌挂件资源；不对核心视频 API 开启全局 MitM，避免触发 SSL Pinning 导致刷视频断网
+#!openUrl = https://apps.apple.com/app/id835599320
+#!author = WansenSpace
+#!tag = 去广告
+#!icon = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/TikTok.png
+#!system = iOS
+#!system_version = 15.0
+#!loon_version = 3.2.1
+#!date = 2026-11-28
+
+[Rule]
+# === 1. TikTok 激励体系 / 内嵌活动容器（InApp / Activity / Incentive / UG）核心子域 ===
+DOMAIN-SUFFIX, inapp.tiktokv.com, REJECT
+DOMAIN-SUFFIX, inapp.tiktokv.eu, REJECT
+DOMAIN-SUFFIX, inapp.tiktokv.us, REJECT
+DOMAIN-SUFFIX, activity.tiktok.com, REJECT
+DOMAIN-SUFFIX, activity.tiktokv.com, REJECT
+DOMAIN-SUFFIX, activity.musical.ly, REJECT
+DOMAIN-SUFFIX, incentive.tiktok.com, REJECT
+DOMAIN-SUFFIX, incentive.tiktokv.com, REJECT
+DOMAIN-SUFFIX, ug.tiktokv.com, REJECT
+DOMAIN, ug-overseas.snssdk.com, REJECT
+
+# === 2. TikTok UG（User Growth 用户增长与 P 币/金币挂件）多区域集群节点 ===
+# 重点覆盖日本/亚太流量所走的新加坡集群（alisg / sg）及欧美集群（va / useast）
+DOMAIN, ug-sg.byteoversea.com, REJECT
+DOMAIN, ug-va.byteoversea.com, REJECT
+DOMAIN, ug-alisg.byteoversea.com, REJECT
+DOMAIN, ug-maliva.byteoversea.com, REJECT
+DOMAIN, ug-va.tiktokv.com, REJECT
+DOMAIN, ug-sg.tiktokv.com, REJECT
+DOMAIN, ug-alisg.tiktokv.com, REJECT
+DOMAIN, ug-i18n.tiktokv.com, REJECT
+DOMAIN, ug-normal-alisg.tiktokv.com, REJECT
+DOMAIN, ug-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, ug-normal-va.tiktokv.com, REJECT
+DOMAIN, ug-normal-useast1a.tiktokv.com, REJECT
+DOMAIN, ug-normal-useast2a.tiktokv.com, REJECT
+DOMAIN, ug16-normal-alisg.tiktokv.com, REJECT
+DOMAIN, ug16-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, ug19-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, ug21-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, ug22-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, ug31-normal-alisg.tiktokv.com, REJECT
+DOMAIN, ug32-normal-alisg.tiktokv.com, REJECT
+DOMAIN, ug16-normal-c-useast1a.tiktokv.com, REJECT
+DOMAIN, ug16-normal-c-useast2a.tiktokv.com, REJECT
+DOMAIN, ug22-normal-c-useast1a.tiktokv.com, REJECT
+DOMAIN, ug22-normal-c-useast2a.tiktokv.com, REJECT
+DOMAIN, ug16-normal-no1a.tiktokv.eu, REJECT
+DOMAIN, ug16-normal-useast5.us.tiktokv.com, REJECT
+
+# === 3. Activity / InApp 多区域动态分片节点 ===
+DOMAIN, activity-sg.tiktokv.com, REJECT
+DOMAIN, activity-va.tiktokv.com, REJECT
+DOMAIN, activity-alisg.tiktokv.com, REJECT
+DOMAIN, activity-i18n.tiktokv.com, REJECT
+DOMAIN, activity16-normal-alisg.tiktokv.com, REJECT
+DOMAIN, activity16-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, activity22-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, activity16-normal-c-useast1a.tiktokv.com, REJECT
+DOMAIN, activity16-normal-c-useast2a.tiktokv.com, REJECT
+DOMAIN, inapp-sg.tiktokv.com, REJECT
+DOMAIN, inapp-va.tiktokv.com, REJECT
+DOMAIN, inapp-alisg.tiktokv.com, REJECT
+DOMAIN, inapp16-normal-alisg.tiktokv.com, REJECT
+DOMAIN, inapp16-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, inapp22-normal-c-alisg.tiktokv.com, REJECT
+
+# === 4. LuckyCat（招财猫激励引擎）与 UG 专属静态物料关键字 ===
+DOMAIN-KEYWORD, luckycat, REJECT
+DOMAIN-KEYWORD, ug-normal, REJECT
+DOMAIN-KEYWORD, ugcdn-tos, REJECT
+DOMAIN-KEYWORD, activity-spring-api, REJECT
+
+# === 5. URL-REGEX 泛匹配兜底（拦截新编号分片如 ug58 / activity77 等） ===
+URL-REGEX, ^https?:\/\/(ug|inapp|incentive|luckycat)[0-9a-z-]*\.(tiktokv\.(com|eu|us)|tiktok\.com|byteoversea\.(com|net)|tik-tokapi\.com|musical\.ly), REJECT
+URL-REGEX, ^https?:\/\/activity[0-9a-z-]*\.(tiktokv\.(com|eu|us)|tiktok\.com|byteoversea\.(com|net)|musical\.ly), REJECT
+
+[Rewrite]
+# === 1. 内嵌激励 H5 / Falcon 容器路径静默返回空字典 ===
+^https?:\/\/(inapp|activity|incentive|ug)[0-9a-z-]*\.(tiktokv\.(com|eu|us)|tiktok\.com|byteoversea\.com)\/.* reject-dict
+
+# === 2. TouchPoint / LuckyCat / UG 悬浮挂件与激励任务接口净化 ===
+# 注：默认不对 api*.tiktokv.com 开启 MitM（防止 App Store 版触发 SSL Pinning 断网）；
+# 若使用去除了证书锁定的自签/巨魔版或已开启 TikTok MitM，以下规则会自动生效剥离挂件配置
+^https?:\/\/[^\/]+\.(tiktokv\.(com|eu|us)|byteoversea\.com|tik-tokapi\.com|tiktok\.com|musical\.ly)\/(?:tiktok\/(?:touchpoint|incentive|ug|referral|bonus)|luckycat|falcon\/(?:incentive|luckycat|ug)|aweme\/v[0-9]+\/(?:ug|touchpoint|incentive|spec_act|pendant|referral))(?:\/|\?|$) reject-dict
+
+# === 3. 悬浮金币/积分挂件动图与静态资源包拦截 ===
+^https?:\/\/[^\/]+\.(ibytedtos\.com|tiktokcdn(-us)?\.com|ibyteimg\.com|ipstatp\.com)\/.*(?:tiktok[-_]incentive|luckycat|touchpoint|coin[-_]pendant|reward[-_]pendant|incentive[-_]campaign)\/ reject-200
+
+[MitM]
+# 仅针对独立的激励/活动/内嵌容器子域开启 MitM（绝不加入 *.tiktokv.com，防止 App Store 版触发 SSL Pinning 无法加载视频）
+hostname = inapp.tiktokv.com, inapp-sg.tiktokv.com, inapp-va.tiktokv.com, inapp-alisg.tiktokv.com, activity.tiktok.com, activity.tiktokv.com, activity-sg.tiktokv.com, activity-va.tiktokv.com, activity-alisg.tiktokv.com, incentive.tiktok.com, incentive.tiktokv.com, ug.tiktokv.com, ug-va.tiktokv.com, ug-sg.tiktokv.com, ug-alisg.tiktokv.com, ug-sg.byteoversea.com, ug-va.byteoversea.com

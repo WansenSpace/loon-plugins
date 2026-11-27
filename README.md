@@ -4,7 +4,15 @@
 
 ## 插件列表
 
-### 闲鱼去广告V2（深度精简版）
+### TikTok 去挂件
+
+- **功能**：屏蔽 TikTok 左上角积分/金币激励悬浮挂件（如日区 P 币ポイ活、福袋、`TouchPoint` / `LuckyCat`），精准阻断 `UG` 增长激励、活动配置与内嵌挂件资源；不对 `*.tiktokv.com` 核心视频 API 开启全局 MitM，避免 App Store 正版触发 SSL Pinning 导致视频流断网。
+- **插件订阅链接（Raw）**：
+  ```
+  https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/TikTok_Hide_Pendant.plugin
+  ```
+
+### 闲鱼去广告V1（深度精简版）
 
 - **功能**：
   - **修复去广告失效**：拦截阿里 AMDC 纯 IP 调度（`mobileDispatch`）与 QUIC，强制闲鱼 MTOP 请求回落标准 HTTPS（同时覆盖 `acs` / `g-acs` / `h5api` 多网关）。
