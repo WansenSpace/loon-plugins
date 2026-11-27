@@ -1,5 +1,5 @@
-#!name = 腾讯动漫去广告
-#!desc = 基于实机抓包优化：拦截腾讯动漫 iOS 开屏/弹窗/气泡/签到领奖入口、起点游戏推广图、腾讯 HTTPDNS、广点通/穿山甲（含直播广告）及国内主流聚合广告 SDK
+#!name = 腾讯动漫去广告（极限净化版）
+#!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、书架推荐/红点、AI/小游戏/宝箱/限免卡、搜索热词、V会员页内容及主流聚合广告 SDK
 #!author = WansenSpace
 #!icon = https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/63/5f/7f/635f7fbf-22c8-feb9-c8db-acda372d6ca3/AppIcon-0-1x_U007emarketing-0-8-0-0-sRGB-85-220-0.png/512x512bb.jpg
 #!system = iOS
@@ -78,21 +78,28 @@ DOMAIN, adashx.m.taobao.com, REJECT
 DOMAIN, adashxgc.ut.taobao.com, REJECT
 
 [Rewrite]
-# 腾讯动漫 iOS 开屏与系统配置广告接口
+# === 开屏、弹窗、气泡、签到领奖 ===
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) reject-dict
-# 腾讯动漫 App 内弹窗、首页悬浮气泡、导航栏促销、签到领奖与礼物通知
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/popup\/.* reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Home\/bubble\/.* reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/navigationBarTip reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/SignIn\/getEventEntrance reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Gift\/getGiftNotice\/.* reject-dict
-# 腾讯动漫通用开屏与推广接口
+
+# === 极限净化：书架推荐/红点、AI 入口、限免卡、成长任务、搜索热词、V会员页 ===
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Recommend\/getBookShelfRecommend reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Bookshelf\/getCollectionRedDot\/.* reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/IntelligentAgent\/getUserCenterComment reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/LimitFreeCard\/getCardInfo reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Task\/getGrowInfo reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Search\/hotWord reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/navigationBarTip reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/homeAsync reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/iosPayConfigs\/.* reject-dict
+
+# === 通用广告与推广接口 ===
 ^https?:\/\/.*\.ac\.qq\.com\/.*(splash|getSplash|bootScreen|adRealTime|promotion\/|getAd|advert) reject-dict
-# 起点游戏推广 GIF 广告（抓包实测）
 ^https?:\/\/img0\.qidian\.com\/upload\/gamesy\/.* reject-img
-# 穿山甲抖音直播广告配置（精准匹配 pangle 路径，不误伤抖音 App）
 ^https?:\/\/webcast-open\.douyin\.com\/webcast\/openapi\/pangle\/.* reject-dict
-# 广点通与穿山甲全系接口返回空 JSON，减少 App 等待超时卡顿
 ^https?:\/\/.*\.gdt\.qq\.com\/.* reject-dict
 ^https?:\/\/.*\.pangolin-sdk-toutiao[0-9a-z-]*\.com\/.* reject-dict
 ^https?:\/\/.*\.pglstatp-toutiao\.com\/.* reject-dict

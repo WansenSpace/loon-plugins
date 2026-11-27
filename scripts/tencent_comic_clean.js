@@ -1,6 +1,6 @@
 /*
- * 腾讯动漫 iOS 请求模块净化脚本 (Loon http-request)
- * 作用：从 /User/async 与 /Home/async 的明文 module_names 参数中剔除广告、宝箱与领奖推广模块
+ * 腾讯动漫 iOS 请求模块净化脚本 (极限净化版 - Loon http-request)
+ * 作用：从 /User/async 与 /Home/async 的明文 module_names 参数中剔除广告、宝箱、AI、小游戏与领奖推广模块
  */
 
 let body = $request.body || "";
@@ -10,6 +10,8 @@ if (body && body.includes("module_names=")) {
     "v_club_ad",
     "wx_mini_game",
     "treasure_box",
+    "ai_chat",
+    "ai_chat_detail",
     "recent_comic_reward_prize",
     "new_back_user_limit_free_card"
   ]);
