@@ -1,5 +1,5 @@
-#!name = 腾讯动漫去广告V3
-#!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、我的页面福利中心/游戏中心/八宫格、书架推荐/红点、AI/限免卡/成长任务、搜索热词、V会员页完整内容及主流聚合广告 SDK
+#!name = 腾讯动漫去广告V5
+#!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、我的页面福利中心/游戏中心/八宫格、书架推荐/红点、AI/限免卡/成长任务、搜索热词及主流聚合广告 SDK
 #!author = WansenSpace
 #!icon = https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/63/5f/7f/635f7fbf-22c8-feb9-c8db-acda372d6ca3/AppIcon-0-1x_U007emarketing-0-8-0-0-sRGB-85-220-0.png/512x512bb.jpg
 #!system = iOS
@@ -113,15 +113,8 @@ DOMAIN, newsentry.qidian.com, REJECT
 # === 搜索热词 ===
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Search\/hotWord reject-200
 
-# === 极限净化：V会员页（主接口 + H5 页 + 专属反馈通道） ===
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/home($|\?|\/) reject-200
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/homeAsync reject-200
+# === V会员页不拦截（V5 起恢复正常），仅保留导航栏促销提示拦截 ===
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/navigationBarTip reject-200
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/iosPayConfigs\/.* reject-200
-^https?:\/\/m\.ac\.qq\.com\/event\/appHtmlPage\/weex\/v-club-home\.html.* reject-200
-^https?:\/\/gtimg(cdn)?\.ac\.qq\.com\/h5_hd\/appHtmlPage\/weex\/(v-club-home|css\/v-club-home).* reject
-^https?:\/\/gtimg(cdn)?\.ac\.qq\.com\/h5_hd\/appHtmlPage\/weex\/images\/v-club\/.* reject-img
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/getAiseeUrl.*v_club_feedback.* reject-200
 
 # === 通用广告与推广接口 ===
 ^https?:\/\/.*\.ac\.qq\.com\/.*(splash|getSplash|bootScreen|adRealTime|promotion\/|getAd|advert) reject-200
