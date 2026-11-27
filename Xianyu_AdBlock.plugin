@@ -1,0 +1,65 @@
+#!name = 闲鱼去广告V1
+#!desc = 阻断阿里 AMDC 纯 IP 调度与 QUIC 防止绕过 MitM；移除开屏广告、首页右上角签到入口、顶栏补贴动图、商品信息流与搜索广告、搜索框填充词、悬浮弹窗；深度精简「我的」页面（移除闲鱼回收、中部工具栏、活动磁贴区及底部猜你喜欢）
+#!openUrl = https://apps.apple.com/app/id510909506
+#!author = WansenSpace
+#!tag = 去广告
+#!icon = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/FleaMarket.png
+#!system = iOS
+#!system_version = 15.0
+#!loon_version = 3.2.1
+#!date = 2026-11-28
+
+[Rule]
+# === 1. 屏蔽 QUIC 与阿里 AMDC 调度，强制闲鱼回落标准 HTTPS 以确保 MitM 生效 ===
+PROTOCOL, QUIC, REJECT
+DOMAIN, amdc.m.taobao.com, REJECT
+DOMAIN, amdc.wapa.taobao.com, REJECT
+DOMAIN, amdc.taobao.net, REJECT
+DOMAIN, mtop-dict.m.taobao.com, REJECT
+URL-REGEX, ^http:\/\/(?![^\/]*alipay)[^\/]+\/amdc\/mobileDispatch, REJECT
+
+# === 2. 闲鱼内置阿里妈妈 TanX / 优酷开屏与主流三方聚合广告 SDK ===
+DOMAIN-SUFFIX, iyes.youku.com, REJECT
+DOMAIN-SUFFIX, tanx.com, REJECT
+DOMAIN, mamasearchad.cloudvideocdn.taobao.com, REJECT
+DOMAIN, alimama.cloudvideocdn.taobao.com, REJECT
+DOMAIN-KEYWORD, pangolin-sdk-toutiao, REJECT
+DOMAIN-SUFFIX, pglstatp-toutiao.com, REJECT
+DOMAIN-SUFFIX, pangolin.snssdk.com, REJECT
+DOMAIN-SUFFIX, csjplatform.com, REJECT
+DOMAIN-SUFFIX, gdt.qq.com, REJECT
+DOMAIN-SUFFIX, gdtimg.com, REJECT
+DOMAIN-SUFFIX, ugdtimg.com, REJECT
+DOMAIN, tangram.e.qq.com, REJECT
+DOMAIN, sdk.e.qq.com, REJECT
+DOMAIN-SUFFIX, sigmob.cn, REJECT
+DOMAIN-SUFFIX, sigmob.com, REJECT
+DOMAIN-SUFFIX, anythinktech.com, REJECT
+DOMAIN-SUFFIX, toponad.com, REJECT
+DOMAIN-SUFFIX, beizi.biz, REJECT
+DOMAIN-SUFFIX, e.kuaishou.com, REJECT
+DOMAIN-SUFFIX, mobads.baidu.com, REJECT
+
+[Rewrite]
+# === 1. 阻断明文 HTTP 的 AMDC 纯 IP 调度请求（不误伤支付宝） ===
+^http:\/\/(?![^\/]*alipay)[^\/]+\/amdc\/mobileDispatch reject
+
+# === 2. 纯广告曝光上报、H5 弹窗及无状态横幅直接拦截 ===
+^https?:\/\/h5\.m\.goofish\.com\/app\/idleFish-F2e\/idlefish-pop reject
+^https?:\/\/h5\.m\.goofish\.com\/wow\/moyu\/moyu-project\/idle-xy-seller-home\/pages\/dress-pop reject-dict
+^https?:\/\/(g-)?acs\.m\.goofish\.com\/gw\/mtop\.idle\.ad\.(expose|click)(?:\/|\?|$) reject-200
+^https?:\/\/(g-)?acs\.m\.goofish\.com\/gw\/mtop\.taobao\.idle\.(popup|float)\.window(?:\/|\?|$) reject-dict
+^https?:\/\/(g-)?acs\.m\.goofish\.com\/gw\/mtop\.taobao\.idle\.live\.home\.ads\.material\.get(?:\/|\?|$) reject-dict
+^https?:\/\/(g-)?acs\.m\.goofish\.com\/gw\/mtop\.taobao\.idle\.topic\.banner(?:\/|\?|$) reject-dict
+^https?:\/\/(g-)?acs\.m\.goofish\.com\/gw\/mtop\.idle\.trade\.item\.recommend\.render(?:\/|\?|$) reject-dict
+^https?:\/\/(g-)?acs\.m\.goofish\.com\/gw\/mtop\.taobao\.idle\.item\.resell\.recommendorhotcate(?:\/|\?|$) reject-dict
+
+[Script]
+# === 核心 MTOP 响应精细净化（保留 MTOP 成功信封防止读取旧缓存，兼容 acs / g-acs / h5api 多网关） ===
+http-response ^https?:\/\/(?:(?:g-)?acs|h5api)\.m\.goofish\.com\/(?:gw|h5)\/mtop\.(?:taobao\.(?:idlecommerce\.splash(?:\.async)?\.ads|idle\.(?:local\.splash|home\.welcome|home\.whale\.modulet|user\.strategy\.list|fun\.follow\.(?:feed\.list|often\.visit)|local\.near\.by\.corner\.info|local\.flow\.plat\.section|local\.home(?:\.top)?|trade\.full\.info|item\.buy\.feeds|item\.recommend\.(?:tab|list)|playboy\.recommend|user\.page\.my\.(?:adapter|feeds))|idlehome\.(?:home\.(?:nextfresh|circle\.list|community|newitem\.page)|widget\.refresh\.get|magic\.home\.page\.list|idle\.coin\.nextfresh)|idlemtopsearch\.(?:(?:detailpage\.)?search\.shade|item\.search\.activate|search\.activate\.tablist|search\.discover|search)|wireless\.home\.xianyu(?:\.my)?\.awesome\.get)|idle\.(?:user\.page\.my\.(?:adapter|feeds)|idleadv\.scene\.restore))(?:\/|\?|$) script-path=https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/scripts/xianyu_clean.js, requires-body=true, max-size=3145728, timeout=15, tag=闲鱼深度去广告
+
+# === 兜底淘宝主网关可能下发的闲鱼开屏与欢迎弹窗 ===
+http-response ^https?:\/\/(?:guide-)?acs\.m\.taobao\.com\/gw\/mtop\.taobao\.(?:idlecommerce\.splash(?:\.async)?\.ads|idle\.home\.welcome)(?:\/|\?|$) script-path=https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/scripts/xianyu_clean.js, requires-body=true, max-size=2097152, timeout=10, tag=闲鱼开屏净化
+
+[MitM]
+hostname = acs.m.goofish.com, g-acs.m.goofish.com, h5api.m.goofish.com, h5.m.goofish.com, acs.m.taobao.com, guide-acs.m.taobao.com
