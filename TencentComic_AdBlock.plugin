@@ -1,5 +1,5 @@
 #!name = 腾讯动漫去广告（极限净化版）
-#!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、书架推荐/红点、AI/小游戏/宝箱/限免卡、搜索热词、V会员页内容及主流聚合广告 SDK
+#!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、我的页面福利中心/游戏中心/八宫格、书架推荐/红点、AI/限免卡/成长任务、搜索热词、V会员页内容及主流聚合广告 SDK
 #!author = WansenSpace
 #!icon = https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/63/5f/7f/635f7fbf-22c8-feb9-c8db-acda372d6ca3/AppIcon-0-1x_U007emarketing-0-8-0-0-sRGB-85-220-0.png/512x512bb.jpg
 #!system = iOS
@@ -78,6 +78,9 @@ DOMAIN, adashx.m.taobao.com, REJECT
 DOMAIN, adashxgc.ut.taobao.com, REJECT
 
 [Rewrite]
+# === 阻断腾讯 HTTPDNS 明文请求 ===
+^http:\/\/119\.29\.29\.98\/.* reject
+
 # === 开屏、弹窗、气泡、签到领奖 ===
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/popup\/.* reject-dict
@@ -85,12 +88,16 @@ DOMAIN, adashxgc.ut.taobao.com, REJECT
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/SignIn\/getEventEntrance reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Gift\/getGiftNotice\/.* reject-dict
 
-# === 极限净化：书架推荐/红点、AI 入口、限免卡、成长任务、搜索热词、V会员页 ===
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Recommend\/getBookShelfRecommend reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Bookshelf\/getCollectionRedDot\/.* reject-dict
+# === 极限净化：「我的」页卡片（福利中心/游戏中心/八宫格/宝箱/小游戏/V会员广告） ===
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/getUserCard reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/async reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/IntelligentAgent\/getUserCenterComment reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/LimitFreeCard\/getCardInfo reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Task\/getGrowInfo reject-dict
+
+# === 极限净化：书架推荐/红点、搜索热词、V会员页 ===
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Recommend\/getBookShelfRecommend reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Bookshelf\/getCollectionRedDot\/.* reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Search\/hotWord reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/navigationBarTip reject-dict
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/homeAsync reject-dict
@@ -103,9 +110,6 @@ DOMAIN, adashxgc.ut.taobao.com, REJECT
 ^https?:\/\/.*\.gdt\.qq\.com\/.* reject-dict
 ^https?:\/\/.*\.pangolin-sdk-toutiao[0-9a-z-]*\.com\/.* reject-dict
 ^https?:\/\/.*\.pglstatp-toutiao\.com\/.* reject-dict
-
-[Script]
-http-request ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/(User|Home)\/async script-path=https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/scripts/tencent_comic_clean.js, requires-body=true, tag=腾讯动漫页面模块净化, enable=true
 
 [MitM]
 hostname = ac.qq.com, iphone.ac.qq.com, *.ac.qq.com, *.gdt.qq.com, *.pangolin-sdk-toutiao.com, *.pangolin-sdk-toutiao1.com, *.pangolin-sdk-toutiao-b.com, *.pglstatp-toutiao.com, webcast-open.douyin.com, img0.qidian.com
