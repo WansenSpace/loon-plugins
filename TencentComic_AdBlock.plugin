@@ -1,4 +1,4 @@
-#!name = 腾讯动漫去广告V2
+#!name = 腾讯动漫去广告V3
 #!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、我的页面福利中心/游戏中心/八宫格、书架推荐/红点、AI/限免卡/成长任务、搜索热词、V会员页完整内容及主流聚合广告 SDK
 #!author = WansenSpace
 #!icon = https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/63/5f/7f/635f7fbf-22c8-feb9-c8db-acda372d6ca3/AppIcon-0-1x_U007emarketing-0-8-0-0-sRGB-85-220-0.png/512x512bb.jpg
@@ -87,41 +87,44 @@ DOMAIN, newsentry.qidian.com, REJECT
 ^http:\/\/119\.29\.29\.98\/.* reject
 
 # === 开屏、弹窗、气泡、签到领奖 ===
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/popup\/.* reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Home\/bubble\/.* reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/SignIn\/getEventEntrance reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Gift\/getGiftNotice\/.* reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/(getSystemConf|bootScreen) reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/popup\/.* reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Home\/bubble\/.* reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/SignIn\/getEventEntrance reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Gift\/getGiftNotice\/.* reject-200
 
 # === 极限净化：「我的」页卡片（福利中心/游戏中心/八宫格/宝箱/小游戏/V会员广告） ===
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/getUserCard reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/async reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/IntelligentAgent\/getUserCenterComment reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/LimitFreeCard\/getCardInfo reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Task\/getGrowInfo reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/getUserCard reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/User\/async reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/IntelligentAgent\/getUserCenterComment reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/LimitFreeCard\/getCardInfo reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Task\/getGrowInfo reject-200
 
 # === 「我的」页红框入口落地页：签到、福利中心、我的卡牌、小游戏 ===
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Task\/getEventEntrance.* reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Welfare\/.* reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/MiniGame\/.* reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Task\/getEventEntrance.* reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Welfare\/.* reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/MiniGame\/.* reject-200
 ^https?:\/\/m\.ac\.qq\.com\/event\/(welfareChannel|cardGame)\/.* reject-200
 ^https?:\/\/gtimgcdn\.ac\.qq\.com\/h5_hd\/(welfareChannel|cardGame)\/.* reject
 
-# === 搜索热词（书架接口为加密数据，拦截会导致“网络故障”，V2 起不再拦截） ===
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Search\/hotWord reject-dict
+# === 书架「喜欢看」推荐（返回空响应，模拟服务器原生“无数据”，避免网络故障） ===
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Recommend\/getBookShelfRecommend reject-200
+
+# === 搜索热词 ===
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Search\/hotWord reject-200
 
 # === 极限净化：V会员页（主接口 + H5 页 + 专属反馈通道） ===
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/home($|\?|\/) reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/homeAsync reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/navigationBarTip reject-dict
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/iosPayConfigs\/.* reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/home($|\?|\/) reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/homeAsync reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/navigationBarTip reject-200
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/iosPayConfigs\/.* reject-200
 ^https?:\/\/m\.ac\.qq\.com\/event\/appHtmlPage\/weex\/v-club-home\.html.* reject-200
 ^https?:\/\/gtimg(cdn)?\.ac\.qq\.com\/h5_hd\/appHtmlPage\/weex\/(v-club-home|css\/v-club-home).* reject
 ^https?:\/\/gtimg(cdn)?\.ac\.qq\.com\/h5_hd\/appHtmlPage\/weex\/images\/v-club\/.* reject-img
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/getAiseeUrl.*v_club_feedback.* reject-dict
+^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/getAiseeUrl.*v_club_feedback.* reject-200
 
 # === 通用广告与推广接口 ===
-^https?:\/\/.*\.ac\.qq\.com\/.*(splash|getSplash|bootScreen|adRealTime|promotion\/|getAd|advert) reject-dict
+^https?:\/\/.*\.ac\.qq\.com\/.*(splash|getSplash|bootScreen|adRealTime|promotion\/|getAd|advert) reject-200
 ^https?:\/\/img0\.qidian\.com\/upload\/gamesy\/.* reject-img
 ^https?:\/\/webcast-open\.douyin\.com\/webcast\/openapi\/pangle\/.* reject-dict
 ^https?:\/\/lf-cdn-tos\.bytescm\.com\/obj\/static\/ad\/.* reject-dict
