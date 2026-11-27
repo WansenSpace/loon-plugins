@@ -12,10 +12,10 @@
   https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/TencentComic_AdBlock.plugin
   ```
 
-### cnBeta 图片修复V1（Folo）
+### cnBeta 图片修复V2（Folo）
 
 - **作用**：解决在 Folo 中 RSS 订阅 cnBeta 新闻时，文章图片经常无法显示（裂图）或加载较慢的问题。
-- **原理**：仅对 cnBeta 的 Folo 图片代理请求解码并 301 长效缓存转直连，使用 Loon 原生 `[Rewrite]` 修复 cnBeta 全系图床防盗链（零 JS 开销），屏蔽 QUIC 防止绕过 MitM，并将图床域名强制直连。
+- **原理**：仅对目标主机为 cnBeta 图床的 Folo 图片代理请求解码并 301 长效缓存转直链（排除 `icons.folo.is` 等无关请求），使用 Loon 原生 `[Rewrite]` 修复防盗链（零 JS 开销），屏蔽 QUIC 防止绕过 MitM，图床默认跟随 Loon 代理分流以避免直连香港机房限速。
 - **插件订阅链接（Raw）**：
   ```
   https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/cnBeta_Folo_Image_Fix.plugin
@@ -26,4 +26,4 @@
 1. 打开 iOS 上的 **Loon** → 底部 **配置** → **插件** → 右上角 `+`。
 2. 粘贴上面的插件订阅链接并安装。
 3. 确保 Loon 首页已开启 **分流**、**复写（Rewrite）** 和 **MitM**（且 CA 证书已在 iOS 设置中完全信任）。
-4. 将腾讯动漫从后台划掉后重启 1~2 次即可生效。
+4. 将对应 App 从后台划掉后重启 1~2 次即可生效。
