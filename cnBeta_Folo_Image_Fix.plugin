@@ -1,0 +1,17 @@
+#!name = cnBeta 图片修复
+#!desc = 自动解码 Folo 图片代理（支持多层 URL 编码与多参数剥离），覆盖 cnBeta 全系图床防盗链并强制直连
+#!author = WansenSpace
+#!loon_version = 3.2.1
+#!date = 2026-11-27
+
+[Rule]
+DOMAIN-SUFFIX, cnbetacdn.com, DIRECT
+DOMAIN-SUFFIX, cnbeta.com.tw, DIRECT
+DOMAIN-SUFFIX, cnbeta.com, DIRECT
+
+[Script]
+http-request ^https?:\/\/(img|img-proxy)\.folo\.is\/.*url= script-path=https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/scripts/folo_cnbeta_redirect.js, tag=Folo代理转直链
+http-request ^https?:\/\/[^\/]+\.(cnbetacdn|cnbeta)\.(com|com\.tw)\/ script-path=https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/scripts/cnbeta_referer_fix.js, tag=cnBeta防盗链修复
+
+[MitM]
+hostname = *.cnbetacdn.com, *.cnbeta.com.tw, *.cnbeta.com, img.folo.is, img-proxy.folo.is
