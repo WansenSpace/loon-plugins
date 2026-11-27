@@ -1,6 +1,6 @@
 # Loon Plugins
 
-个人维护的 iOS Loon 去广告插件仓库。
+个人维护的 iOS Loon 插件仓库（含去广告、图床修复等实用插件）。
 
 ## 插件列表
 
@@ -14,7 +14,8 @@
 
 ### cnBeta 图片修复（Folo）
 
-- **功能**：自动解码 Folo 图片代理（支持多层 URL 编码与多参数剥离），覆盖 cnBeta 全系图床防盗链并强制直连。
+- **作用**：解决在 Folo 中 RSS 订阅 cnBeta 新闻时，文章图片经常无法显示（裂图）的问题。
+- **原理**：自动解码 Folo 图片代理链接并重定向为原图直连，同时为 cnBeta 全系图床补全防盗链请求头并强制直连。
 - **插件订阅链接（Raw）**：
   ```
   https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/cnBeta_Folo_Image_Fix.plugin
