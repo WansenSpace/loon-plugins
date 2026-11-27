@@ -1,4 +1,4 @@
-#!name = 腾讯动漫去广告V4
+#!name = 腾讯动漫去广告V3
 #!desc = 极限净化：拦截开屏/弹窗/气泡/签到领奖、我的页面福利中心/游戏中心/八宫格、书架推荐/红点、AI/限免卡/成长任务、搜索热词、V会员页完整内容及主流聚合广告 SDK
 #!author = WansenSpace
 #!icon = https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/63/5f/7f/635f7fbf-22c8-feb9-c8db-acda372d6ca3/AppIcon-0-1x_U007emarketing-0-8-0-0-sRGB-85-220-0.png/512x512bb.jpg
@@ -112,11 +112,6 @@ DOMAIN, newsentry.qidian.com, REJECT
 
 # === 搜索热词 ===
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Search\/hotWord reject-200
-
-# === V4 实验：拦截全局配置 / AB 实验 / 离线页面配置，尝试隐藏底部「V会员」并阻止离线页面 ===
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/commonConf reject-200
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/ABTest\/getExperimentList reject-200
-^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/Support\/getHybridConf.* reject-200
 
 # === 极限净化：V会员页（主接口 + H5 页 + 专属反馈通道） ===
 ^https?:\/\/(iphone\.)?ac\.qq\.com\/.*\/VClub\/home($|\?|\/) reject-200
