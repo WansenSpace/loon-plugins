@@ -4,7 +4,7 @@
 
 ## 插件列表
 
-### TikTok 去挂件
+### TikTok 去挂件V2
 
 - **功能**：屏蔽 TikTok 左上角积分/金币激励悬浮挂件（如日区 P 币ポイ活、福袋、`TouchPoint` / `LuckyCat`）：阻断字节海外 TTNet 纯 IP HTTPDNS（`34.102.215.99` / `35.213.190.132`）绕过与 QUIC，精准拦截专属激励图标图床（`ug-incentive`）及 TTNet 内部重写后的 `ugattribution` / `libra` / `widget` / `campaign` / `inapp` 子域；不对 `*.tiktokv.com` 核心视频 API 开启全局 MitM，避免 App Store 正版触发 SSL Pinning 断网。
 - **插件订阅链接（Raw）**：
