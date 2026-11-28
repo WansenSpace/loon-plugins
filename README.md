@@ -4,14 +4,6 @@
 
 ## 插件列表
 
-### TikTok 去挂件V3
-
-- **功能**：屏蔽 TikTok 左上角积分/金币激励悬浮挂件（如日区 P 币ポイ活、福袋、`TouchPoint` / `LuckyCat`）：阻断字节海外 TTNet 纯 IP HTTPDNS（`34.102.215.99` / `35.213.190.132`）绕过与 QUIC，拦截实测下发挂件模板的 `gecko31-normal-alisg.tiktokv.com` 及全系 `Gecko / Teko` 动态组件热更新源、专属激励图床（`ug-incentive`）与 `ugattribution` / `libra` / `widget` / `campaign` / `inapp` 子域；不对 `*.tiktokv.com` 核心视频 API 开启全局 MitM，避免 App Store 正版触发 SSL Pinning 断网。
-- **插件订阅链接（Raw）**：
-  ```
-  https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/TikTok_Hide_Pendant.plugin
-  ```
-
 ### 闲鱼去广告V3（深度精简版）
 
 - **功能**：
