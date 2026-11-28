@@ -4,9 +4,9 @@
 
 ## 插件列表
 
-### 中国电信去开屏广告V1
+### 中国电信去开屏广告V2
 
-- **功能**：拦截中国电信 App 开屏启动广告、欢迎页动画（`zt-app.go189.cn` / `cloud.189.cn`）、电信 21CN 广告联盟子域及国内主流三方聚合广告 SDK（穿山甲、优量汇、百度百青藤、快手、Sigmob、TopOn、倍孜、京东、阿里），并屏蔽 QUIC 防止绕过 MitM；不拦截 `e.189.cn` / `client.189.cn` 等核心业务域，避免误伤登录与话费查询。
+- **功能**：在 `[Rule]` 层精准阻断中国电信 App 实测自研多活开屏广告网关（`appgoadhd.189.cn`、`appgoadsz.189.cn` 及全系 `appgoad` 子域，无视 SSL Pinning），同时拦截欢迎页动画（`zt-app.go189.cn` / `cloud.189.cn`）、电信 21CN 广告联盟子域及国内主流三方聚合广告 SDK（穿山甲、优量汇、百度百青藤、快手、Sigmob、TopOn、倍孜、京东、阿里），并屏蔽 QUIC；不拦截 `appgohd.189.cn`、`appgosz.189.cn`、`appgologinsz.189.cn` 等核心业务与登录域，避免误伤话费查询和天翼账号登录。
 - **插件订阅链接（Raw）**：
   ```
   https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/ChinaTelecom_AdBlock.plugin

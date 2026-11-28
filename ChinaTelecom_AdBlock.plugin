@@ -1,5 +1,5 @@
-#!name = 中国电信去开屏广告V1
-#!desc = 拦截中国电信 App 开屏启动广告、欢迎页动画、电信 21CN 广告联盟子域及国内主流三方聚合广告 SDK（穿山甲、优量汇、百度、快手、Sigmob、TopOn、倍孜、京东、阿里），屏蔽 QUIC 防止绕过 MitM；不误伤话费查询与天翼账号登录
+#!name = 中国电信去开屏广告V2
+#!desc = 拦截中国电信 App 自研多活开屏广告网关（appgoadhd / appgoadsz / appgoad）、欢迎页动画、电信 21CN 广告联盟子域及国内主流三方聚合广告 SDK，屏蔽 QUIC 防止绕过；不拦截 appgohd / appgosz / appgologinsz 等核心业务与登录域
 #!openUrl = https://apps.apple.com/cn/app/id513836029
 #!author = WansenSpace
 #!tag = 去广告
@@ -13,7 +13,14 @@
 # === 1. 屏蔽 QUIC，防止绕过域名规则与 MitM ===
 PROTOCOL, QUIC, REJECT
 
-# === 2. 中国电信 / 21CN 广告与统计子域（不拦截 e.189.cn / client.189.cn 等核心业务域） ===
+# === 2. 中国电信 AppGo 自研多活开屏广告网关（抓包实测：appgoadhd.189.cn 等） ===
+# 说明：核心业务走 appgohd.189.cn / appgosz.189.cn，登录走 appgologinsz.189.cn，均不受影响；Rule 层直接拒绝，无视 SSL Pinning
+DOMAIN, appgoad.189.cn, REJECT
+DOMAIN, appgoadhd.189.cn, REJECT
+DOMAIN, appgoadsz.189.cn, REJECT
+DOMAIN-KEYWORD, appgoad, REJECT
+
+# === 3. 中国电信 / 21CN 广告与统计子域（不拦截 e.189.cn / client.189.cn 等核心业务域） ===
 DOMAIN, ad.21cn.com, REJECT
 DOMAIN, ad.k.21cn.com, REJECT
 DOMAIN, admarket.21cn.com, REJECT
