@@ -4,6 +4,14 @@
 
 ## 插件列表
 
+### 中国电信去开屏广告V1
+
+- **功能**：拦截中国电信 App 开屏启动广告、欢迎页动画（`zt-app.go189.cn` / `cloud.189.cn`）、电信 21CN 广告联盟子域及国内主流三方聚合广告 SDK（穿山甲、优量汇、百度百青藤、快手、Sigmob、TopOn、倍孜、京东、阿里），并屏蔽 QUIC 防止绕过 MitM；不拦截 `e.189.cn` / `client.189.cn` 等核心业务域，避免误伤登录与话费查询。
+- **插件订阅链接（Raw）**：
+  ```
+  https://raw.githubusercontent.com/WansenSpace/loon-plugins/main/ChinaTelecom_AdBlock.plugin
+  ```
+
 ### TikTok 去挂件V3
 
 - **功能**：屏蔽 TikTok 左上角积分/金币激励悬浮挂件（如日区 P 币ポイ活、福袋、`TouchPoint` / `LuckyCat`）：阻断字节海外 TTNet 纯 IP HTTPDNS（`34.102.215.99` / `35.213.190.132`）绕过与 QUIC，拦截实测下发挂件模板的 `gecko31-normal-alisg.tiktokv.com` 及全系 `Gecko / Teko` 动态组件热更新源、专属激励图床（`ug-incentive`）与 `ugattribution` / `libra` / `widget` / `campaign` / `inapp` 子域；不对 `*.tiktokv.com` 核心视频 API 开启全局 MitM，避免 App Store 正版触发 SSL Pinning 断网。
