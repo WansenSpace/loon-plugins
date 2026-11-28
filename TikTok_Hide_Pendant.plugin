@@ -1,5 +1,5 @@
-#!name = TikTok 去挂件V2
-#!desc = 屏蔽 TikTok 左上角积分/金币激励悬浮挂件（日区 P 币/福袋/TouchPoint/LuckyCat）：阻断字节海外 TTNet 纯 IP HTTPDNS 绕过与 QUIC，精准拦截 v47 专属激励图标图床（ug-incentive）、TTNet 重写后的 ugattribution/libra/widget/campaign/inapp 子域，不对核心视频流开启全局 MitM
+#!name = TikTok 去挂件V3
+#!desc = 屏蔽 TikTok 左上角积分/金币激励悬浮挂件（日区 P 币/福袋/TouchPoint/LuckyCat）：阻断 TTNet 纯 IP HTTPDNS 与 QUIC，拦截实测挂件热更新源 gecko31-normal-alisg 及全系 Gecko/Teko 动态 Lynx 组件包、ug-incentive 专属图床与 ugattribution/libra/widget/campaign/inapp 子域
 #!openUrl = https://apps.apple.com/app/id835599320
 #!author = WansenSpace
 #!tag = 去广告
@@ -23,7 +23,31 @@ DOMAIN, httpdns.byteoversea.com, REJECT
 DOMAIN, doh.byteoversea.com, REJECT
 DOMAIN, qdns-v5-tt.polaris.byteoversea.com, REJECT
 
-# === 2. 阻断 TikTok 悬浮积分/金币挂件专属图标 CDN（v47 反编译实锤 ug-incentive 图床） ===
+# === 2. 阻断实测下发左上角 P 币挂件模板的 Gecko / Teko 动态 Lynx 热更新通道 ===
+# 实测抓获：gecko31-normal-alisg.tiktokv.com:443 在挂件出现瞬间连续触发
+DOMAIN, gecko31-normal-alisg.tiktokv.com, REJECT
+DOMAIN, gecko31-normal-useast1a.tiktokv.com, REJECT
+DOMAIN, gecko32-normal-alisg.tiktokv.com, REJECT
+DOMAIN, gecko32-normal-no1a.tiktokv.eu, REJECT
+DOMAIN, gecko16-normal-alisg.tiktokv.com, REJECT
+DOMAIN, gecko16-normal-c-alisg.tiktokv.com, REJECT
+DOMAIN, gecko16-normal-c-useast1a.tiktokv.com, REJECT
+DOMAIN, gecko16-normal-c-useast2a.tiktokv.com, REJECT
+DOMAIN, gecko16-normal-no1a.tiktokv.eu, REJECT
+DOMAIN, gecko-boot.tiktokv.com, REJECT
+DOMAIN, gecko-sg.tiktokv.com, REJECT
+DOMAIN, gecko-va.tiktokv.com, REJECT
+DOMAIN, gecko-sg.byteoversea.com, REJECT
+DOMAIN, gecko-va.byteoversea.com, REJECT
+DOMAIN-SUFFIX, bytegecko-i18n.com, REJECT
+DOMAIN-KEYWORD, geckocdn, REJECT
+DOMAIN-KEYWORD, gecko-source, REJECT
+DOMAIN-KEYWORD, sf-gecko, REJECT
+DOMAIN-KEYWORD, teko-source, REJECT
+DOMAIN-KEYWORD, teko-proxy-source, REJECT
+URL-REGEX, ^https?:\/\/gecko[0-9a-z-]*\.(tiktokv\.(com|eu|us)|byteoversea\.(com|net)|musical\.ly), REJECT
+
+# === 3. 阻断 TikTok 悬浮积分/金币挂件专属图标 CDN（v47 反编译实锤 ug-incentive 图床） ===
 DOMAIN, p16-ug-incentive-img-sg.tiktokcdn.com, REJECT
 DOMAIN, p16-ug-incentive-img-va.tiktokcdn.com, REJECT
 DOMAIN, p19-ug-incentive-img-sg.tiktokcdn.com, REJECT
@@ -31,8 +55,7 @@ DOMAIN, p19-ug-incentive-img-va.tiktokcdn.com, REJECT
 DOMAIN-KEYWORD, ug-incentive, REJECT
 DOMAIN-KEYWORD, ugcdn-tos, REJECT
 
-# === 3. 阻断 TTNet 内部重写后的 UG 归因、挂件（Widget/Campaign）与 Libra 活动实验开关 ===
-# 注：TTNet 内置调度会将 ug-sg.byteoversea.com 重写为 ugattribution-sg -> ugattribution-boot.tiktokv.com
+# === 4. 阻断 TTNet 内部重写后的 UG 归因、挂件（Widget/Campaign）与 Libra 活动实验开关 ===
 DOMAIN-KEYWORD, ugattribution, REJECT
 DOMAIN-KEYWORD, ug-normal, REJECT
 DOMAIN-KEYWORD, luckycat, REJECT
@@ -59,7 +82,7 @@ DOMAIN, abtest-sg-tiktok.byteoversea.com, REJECT
 DOMAIN, abtest-va-tiktok.byteoversea.com, REJECT
 DOMAIN, abtest-va-tiktok-useast2a.byteoversea.com, REJECT
 
-# === 4. TikTok 激励体系 / 内嵌活动容器（InApp / Activity / Incentive / UG）全区域集群 ===
+# === 5. TikTok 激励体系 / 内嵌活动容器（InApp / Activity / Incentive / UG）全区域集群 ===
 DOMAIN-SUFFIX, inapp.tiktokv.com, REJECT
 DOMAIN-SUFFIX, inapp.tiktokv.eu, REJECT
 DOMAIN-SUFFIX, inapp.tiktokv.us, REJECT
@@ -109,7 +132,7 @@ DOMAIN, inapp16-normal-alisg.tiktokv.com, REJECT
 DOMAIN, inapp16-normal-c-alisg.tiktokv.com, REJECT
 DOMAIN, inapp22-normal-c-alisg.tiktokv.com, REJECT
 
-# === 5. URL-REGEX 泛匹配兜底（拦截动态分片域名，不含逗号） ===
+# === 6. URL-REGEX 泛匹配兜底（拦截动态分片域名，不含逗号） ===
 URL-REGEX, ^https?:\/\/(ug|ugattribution|inapp|incentive|luckycat|campaign|widget|libra)[0-9a-z-]*\.(tiktokv\.(com|eu|us)|tiktok\.com|byteoversea\.(com|net)|tik-tokapi\.com|musical\.ly), REJECT
 URL-REGEX, ^https?:\/\/activity[0-9a-z-]*\.(tiktokv\.(com|eu|us)|tiktok\.com|byteoversea\.(com|net)|musical\.ly), REJECT
 URL-REGEX, ^https?:\/\/[0-9a-z-]*ug-incentive[0-9a-z-]*\.(tiktokcdn(-us|-eu)?\.com|ibyteimg\.com|ibytedtos\.com), REJECT
@@ -118,8 +141,8 @@ URL-REGEX, ^https?:\/\/[0-9a-z-]*ug-incentive[0-9a-z-]*\.(tiktokcdn(-us|-eu)?\.c
 # === 1. 阻断 TTNet 明文/HTTPS 纯 IP HTTPDNS 查询 ===
 ^https?:\/\/(34\.102\.215\.99|35\.213\.190\.132|130\.35\.75\.83)\/.* reject
 
-# === 2. 内嵌激励 H5 / Falcon 容器与实验配置静默返回空字典 ===
-^https?:\/\/(inapp|activity|incentive|ug|ugattribution|campaign|widget|libra)[0-9a-z-]*\.(tiktokv\.(com|eu|us)|tiktok\.com|byteoversea\.com)\/.* reject-dict
+# === 2. 内嵌激励 H5 / Falcon / Gecko 热更新与实验配置静默返回空字典 ===
+^https?:\/\/(inapp|activity|incentive|ug|ugattribution|campaign|widget|libra|gecko)[0-9a-z-]*\.(tiktokv\.(com|eu|us)|tiktok\.com|byteoversea\.com)\/.* reject-dict
 
 # === 3. TouchPoint / LuckyCat / UG 悬浮挂件与激励任务接口净化 ===
 ^https?:\/\/[^\/]+\.(tiktokv\.(com|eu|us)|byteoversea\.com|tik-tokapi\.com|tiktok\.com|musical\.ly)\/(?:tiktok\/(?:touchpoint|incentive|ug|referral|bonus)|luckycat|falcon\/(?:incentive|luckycat|ug)|aweme\/v[0-9]+\/(?:ug|touchpoint|incentive|spec_act|pendant|referral))(?:\/|\?|$) reject-dict
